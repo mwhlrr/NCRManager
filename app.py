@@ -32,6 +32,11 @@ class CurrentNcr(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+# Redirect from the homepage to the login page
+@app.route('/')
+def home():
+    return redirect(url_for('login'))
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
