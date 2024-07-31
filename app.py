@@ -43,6 +43,10 @@ def register():
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
+        user = User.query.filter_by(email=email).first()
+        if user:
+            flash('Email address already exists')
+            return redirect(url_for('register'))
         
         if not email.endswith('@gisy.com'):
             flash('Registration is only allowed with an @gisy.com email address.')
