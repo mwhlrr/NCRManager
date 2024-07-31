@@ -1,6 +1,7 @@
 from flask import Flask, render_template, redirect, url_for, request, jsonify, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+import os
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
@@ -13,7 +14,7 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
-    mail = db.Column(db.String(150), unique=True, nullable=False)
+    email = db.Column(db.String(150), unique=True, nullable=False)
 
 class Data(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -26,7 +27,6 @@ class CurrentNcr(db.Model):
     customer = db.Column(db.String(150), nullable=False)
     job_number = db.Column(db.String(50), nullable=False)
     type = db.Column(db.String(50), nullable=False)
-
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -74,9 +74,12 @@ def login():
         if user and user.password == password:
             login_user(user)
             return redirect(url_for('dashboard'))
+        else:
+            flash('Invalid username or password')
+            return redirect(url_for('login'))
     return render_template('login.html')
 
-@app.route('/dashboard')
+@app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
     filters = {
@@ -95,7 +98,7 @@ def dashboard():
         if filters["date_to"]:
             query = query.filter(CurrentNcr.date <= filters["date_to"])
         if filters["customer"]:
-            query = query.filter(CurrentNcr.company.in_(filters["customer"]))
+            query = query.filter(CurrentNcr.customer.in_(filters["customer"]))
         if filters["job_number"]:
             query = query.filter(CurrentNcr.job_number.like(f"%{filters['job_number']}%"))
         if filters["type"]:
@@ -107,7 +110,6 @@ def dashboard():
             flash('No entries found for the specified filters.')
     else:
         entries = query.all()
-    entries = CurrentNcr.query.all() #is this going to be a problem when I run the app?
 
     return render_template('dashboard.html', entries=entries, filters=filters)
 
@@ -140,7 +142,10 @@ def create_database():
     
     return render_template('create_database.html')
 
+# Initialize the database if it doesn't exist
+if not os.path.exists('app.db'):
+    with app.app_context():
+        db.create_all()
 
 if __name__ == '__main__':
-    db.create_all()
     app.run(debug=True)
