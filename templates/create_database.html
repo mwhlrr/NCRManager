@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+    <title>Create Database</title>
+</head>
+<body>
+    <h1>Create Database Entry</h1>
+    <form method="POST">
+        <input type="text" name="date" placeholder="Date (YYYY-MM-DD)" required>
+        <input type="text" name="company" placeholder="Company" required>
+        <input type="text" name="job_number" placeholder="Job Number" required>
+        <input type="text" name="type" placeholder="Type" required>
+        <button type="submit">Create Entry</button>
+    </form>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+    <br><br>
+    <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

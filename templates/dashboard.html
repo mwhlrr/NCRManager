@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+<body>
+    <h1>Dashboard</h1>
+    <a href="{{ url_for('logout') }}">Logout</a>
+    <br><br>
+    <a href="{{ url_for('create_database') }}">Create Database</a>
+    <br><br>
+    <h2>Filter Entries</h2>
+    <form method="POST">
+        <label for="date_from">From Date:</label>
+        <input type="text" id="date_from" name="date_from" class="datepicker" value="{{ filters['date_from'] }}">
+        <label for="date_to">To Date:</label>
+        <input type="text" id="date_to" name="date_to" class="datepicker" value="{{ filters['date_to'] }}">
+        <br><br>
+        <label for="company">Company:</label><br>
+        <input type="checkbox" name="company" value="Hess" {% if 'Hess' in filters['company'] %}checked{% endif %}> Hess<br>
+        <input type="checkbox" name="company" value="BP" {% if 'BP' in filters['company'] %}checked{% endif %}> BP<br>
+        <input type="checkbox" name="company" value="Shell" {% if 'Shell' in filters['company'] %}checked{% endif %}> Shell<br>
+        <br><br>
+        <label for="job_number">Job Number:</label>
+        <input type="text" name="job_number" value="{{ filters['job_number'] }}">
+        <br><br>
+        <label for="type">Type:</label>
+        <input type="text" name="type" value="{{ filters['type'] }}">
+        <br><br>
+        <button type="submit">Filter</button>
+    </form>
+    <br><br>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+    <h2>NCR Entries</h2>
+    <table border="1">
+        <tr>
+            <th>Date</th>
+            <th>Company</th>
+            <th>Job Number</th>
+            <th>Type</th>
+        </tr>
+        {% for entry in entries %}
+        <tr>
+            <td>{{ entry.date }}</td>
+            <td>{{ entry.company }}</td>
+            <td>{{ entry.job_number }}</td>
+            <td>{{ entry.type }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <script>
+        flatpickr(".datepicker", {
+            dateFormat: "Y-m-d"
+        });
+    </script>
+</body>
+</html>
