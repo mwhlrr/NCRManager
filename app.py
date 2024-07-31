@@ -142,6 +142,12 @@ def create_database():
     
     return render_template('create_database.html')
 
+@app.route('/users')
+def users():
+    all_users = User.query.all()
+    return render_template('users.html', users=all_users)
+
+
 # Initialize the database if it doesn't exist
 if not os.path.exists('app.db'):
     with app.app_context():
